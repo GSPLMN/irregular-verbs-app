@@ -1,50 +1,62 @@
 document.addEventListener("DOMContentLoaded", () => {
   fetch("verbs.csv")
-    .then(r => {
-      if (!r.ok) throw new Error("verbs.csv non trovato");
-      return r.text();
-    })
+    .then(r => r.text())
     .then(csv => {
-      const lines = csv.split("\n").slice(1);
-      const list = document.getElementById("audio-list");
+      const rows = csv.split("\n").slice(1); // salta intestazione
+      const tbody = document.querySelector("#verbs-table tbody");
 
-      list.innerHTML = "";
+      rows.forEach(row => {
+        if (!row.trim()) return;
 
-      lines.forEach(line => {
-        if (!line.trim()) return;
+        const cols = row.split(",");
 
-        const firstComma = line.indexOf(",");
-        if (firstComma === -1) return;
+        const tr = document.createElement("tr");
 
-        const forms = line
-          .slice(0, firstComma)
-          .replace(/"/g, "")
-          .trim(); // es: take - took - taken
+        // === COLONNA 1: Base - PS - PP + AUDIO ===
+        const verbForms = cols[0].replace(/"/g, "").trim();
 
-        const fileName = forms
+        const fileName = verbForms
           .toLowerCase()
-          .replace(/–|—/g, "-")      // trattini lunghi → normale
-          .replace(/\s*-\s*/g, "-")  // spazi attorno ai trattini → -
-          .replace(/\s+/g, "-")      // spazi → -
-          .replace(/[^a-z\-]/g, "")  // solo lettere e trattino
-          .replace(/-+/g, "-")       // sequenze multiple di trattini → singolo
+          .replace(/\s*-\s*/g, "-")
+          .replace(/\s+/g, "-")
+          .replace(/[^a-z\-]/g, "")
           + ".mp3";
 
-        const a = document.createElement("a");
-        a.href = "audio/" + fileName; 
-        a.textContent = fileName;
-        a.target = "_blank";
+        const tdVerb = document.createElement("td");
 
-        const li = document.createElement("li");
-        li.appendChild(a);
+        const btn = document.createElement("button");
+        btn.textContent = verbForms;
 
-        list.appendChild(li);
+        const audio = document.createElement("audio");
+        audio.src = "audio/" + fileName;
+        audio.controls = true;
+        audio.style.display = "none";
+
+        btn.onclick = () => {
+          document.querySelectorAll("audio").forEach(a => {
+            a.pause();
+            a.style.display = "none";
+          });
+          audio.style.display = "block";
+          audio.play();
+        };
+
+        tdVerb.appendChild(btn);
+        tdVerb.appendChild(audio);
+        tr.appendChild(tdVerb);
+
+        // === ALTRE COLONNE: SOLO TESTO ===
+        for (let i = 1; i < cols.length; i++) {
+          const td = document.createElement("td");
+          td.textContent = cols[i].replace(/"/g, "").trim();
+          tr.appendChild(td);
+        }
+
+        tbody.appendChild(tr);
       });
-    })
-    .catch(err => {
-      console.error(err);
     });
 });
+
 
 
 
