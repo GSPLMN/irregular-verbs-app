@@ -23,15 +23,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const fileName = forms
           .toLowerCase()
-          .replace(/–|—/g, "-")        // trattini lunghi → -
-          .replace(/\s*-\s*/g, "-")    // " - " → "-"
-          .replace(/\s+/g, "-")        // spazi → -
-          .replace(/[^a-z\-]/g, "")    // solo lettere e -
-          .replace(/-+/g, "-")         // --- → -
+          .replace(/–|—/g, "-")      // trattini lunghi → normale
+          .replace(/\s*-\s*/g, "-")  // spazi attorno ai trattini → -
+          .replace(/\s+/g, "-")      // spazi → -
+          .replace(/[^a-z\-]/g, "")  // solo lettere e trattino
+          .replace(/-+/g, "-")       // sequenze multiple di trattini → singolo
           + ".mp3";
 
         const a = document.createElement("a");
-         console.log("MP3 URL:", "audio/" + fileName);
         a.href = "audio/" + fileName;
         a.textContent = fileName;
         a.target = "_blank";
@@ -46,6 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error(err);
     });
 });
+
 
 
 
