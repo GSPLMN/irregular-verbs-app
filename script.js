@@ -23,9 +23,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const fileName = forms
           .toLowerCase()
-          .replace(/–|—/g, "-")   // trattini lunghi → -
-          .replace(/\s+/g, "-")   // spazi → -
-          .replace(/[^a-z\-]/g, "") // solo lettere e -
+          .replace(/–|—/g, "-")        // trattini lunghi → -
+          .replace(/\s*-\s*/g, "-")    // " - " → "-"
+          .replace(/\s+/g, "-")        // spazi → -
+          .replace(/[^a-z\-]/g, "")    // solo lettere e -
+          .replace(/-+/g, "-")         // --- → -
           + ".mp3";
 
         const a = document.createElement("a");
@@ -43,6 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error(err);
     });
 });
+
 
 
 
