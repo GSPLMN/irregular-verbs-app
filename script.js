@@ -1,61 +1,54 @@
 document.addEventListener("DOMContentLoaded", () => {
   fetch("verbs.csv")
-    .then(r => r.text())
+    .then(response => {
+      if (!response.ok) throw new Error("verbs.csv non trovato");
+      return response.text();
+    })
     .then(csv => {
-      const rows = csv.split("\n").slice(1); // salta intestazione
-      const tbody = document.querySelector("#verbs-table tbody");
+      const lines = csv.split("\n").slice(1); // salta intestazione
+      const list = document.getElementById("audio-list");
 
-      rows.forEach(row => {
-        if (!row.trim()) return;
+      list.innerHTML = ""; // pulisce la lista prima di popolare
 
-        const cols = row.split(",");
+      lines.forEach(line => {
+        if (!line.trim()) return;
 
-        const tr = document.createElement("tr");
+        // prendi solo la prima colonna (Base - PS - PP)
+        const firstComma = line.indexOf(",");
+        if (firstComma === -1) return;
 
-        // === COLONNA 1: Base - PS - PP + AUDIO ===
-        const verbForms = cols[0].replace(/"/g, "").trim();
+        const forms = line
+          .slice(0, firstComma)
+          .replace(/"/g, "")
+          .trim();
 
-        const fileName = verbForms
+        // genera il nome del file mp3, normalizzando trattini e spazi
+        const fileName = forms
           .toLowerCase()
-          .replace(/\s*-\s*/g, "-")
-          .replace(/\s+/g, "-")
-          .replace(/[^a-z\-]/g, "")
+          .replace(/–|—/g, "-")      // trattini lunghi → normale
+          .replace(/\s*-\s*/g, "-")  // spazio-trattino-spazio → -
+          .replace(/\s+/g, "-")      // spazi → -
+          .replace(/[^a-z\-]/g, "")  // solo lettere e trattino
+          .replace(/-+/g, "-")       // sequenze multiple → singolo
           + ".mp3";
 
-        const tdVerb = document.createElement("td");
+        // crea elemento lista e link
+        const li = document.createElement("li");
+        const a = document.createElement("a");
+        a.href = "audio/" + fileName;
+        a.textContent = fileName;
+        a.target = "_blank";
 
-        const btn = document.createElement("button");
-        btn.textContent = verbForms;
-
-        const audio = document.createElement("audio");
-        audio.src = "audio/" + fileName;
-        audio.controls = true;
-        audio.style.display = "none";
-
-        btn.onclick = () => {
-          document.querySelectorAll("audio").forEach(a => {
-            a.pause();
-            a.style.display = "none";
-          });
-          audio.style.display = "block";
-          audio.play();
-        };
-
-        tdVerb.appendChild(btn);
-        tdVerb.appendChild(audio);
-        tr.appendChild(tdVerb);
-
-        // === ALTRE COLONNE: SOLO TESTO ===
-        for (let i = 1; i < cols.length; i++) {
-          const td = document.createElement("td");
-          td.textContent = cols[i].replace(/"/g, "").trim();
-          tr.appendChild(td);
-        }
-
-        tbody.appendChild(tr);
+        li.appendChild(a);
+        list.appendChild(li);
       });
+    })
+    .catch(err => {
+      console.error("Errore:", err);
     });
 });
+
+
 
 
 
