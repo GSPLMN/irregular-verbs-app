@@ -23,8 +23,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const fileName = forms
           .toLowerCase()
-          .replace(/\s*/g, "")
-          .replace(/–/g, "-") + ".mp3";
+          .replace(/–|—/g, "-")   // trattini lunghi → -
+          .replace(/\s+/g, "-")   // spazi → -
+          .replace(/[^a-z\-]/g, "") // solo lettere e -
+          + ".mp3";
 
         const a = document.createElement("a");
         a.href = "audio/" + fileName;
@@ -41,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error(err);
     });
 });
+
 
 
 
