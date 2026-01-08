@@ -31,6 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
           + ".mp3";
 
         const a = document.createElement("a");
+         console.log("MP3 URL:", "audio/" + fileName);
         a.href = "audio/" + fileName;
         a.textContent = fileName;
         a.target = "_blank";
@@ -45,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error(err);
     });
 });
+
 
 
 
